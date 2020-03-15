@@ -7,11 +7,18 @@ git clone https://github.com/mayur040993/rbac.git
 
 After cloning this you can find requirenment.txt
 
-##Install Dependency
+### Install Dependency
 
 **pip install -r requirenment.txt**
 
-##Initialize System
+### Setting up migrations
+Run following commands.
+
+**python manage.py migrate** <br>
+if you are facing some issue while migrating DB, run below command before above command<br>
+**RUN:** python manage.py makemigrations 
+
+### Initialize System
 
 You can init system with few Resources, Roles(which have resources with different permission set), Admin User(admin) and Normal User(User1)
 
