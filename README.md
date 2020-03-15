@@ -1,4 +1,4 @@
-#RBAC 
+# RBAC 
 
 This rbac project is build on Django Framework which is totally based on CLI.
 
@@ -11,7 +11,7 @@ After cloning this you can find requirenment.txt
 
 **pip install -r requirenment.txt**
 
-##Initialize System
+## Initialize System
 
 You can init system with few Resources, Roles(which have resources with different permission set), Admin User(admin) and Normal User(User1)
 
@@ -21,7 +21,7 @@ Run Following command to initialize the system with basic info.
 
 When you enter the init command it will ask you to input some data 
 
-####>Example:
+#### Example:
 
 >`Admin Name: Admin` <br>
 `Admin Password:` <br>
@@ -38,7 +38,7 @@ When you enter the init command it will ask you to input some data
 `Action Type [Default Read] (Read, Write, Delete)`<br>
 
 
-##For Login
+## For Login
 **python manage.py login**
 
 If you login using admin user, you will get the following options.
@@ -56,7 +56,7 @@ Every Options is self explanatory.
 You can change action_type,users of a particular role based on role name.
 On selecting options 3, It will list all the role with the following options.
 
-####Example
+#### Example
 
 >`Enter Role Name to Edit : <role_name>`<br>
 `Action Type (Read, Write, Delete) : Read`<br>
