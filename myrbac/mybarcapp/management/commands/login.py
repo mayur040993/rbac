@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from goto import with_goto
-from ...models import Role, Resource
+from ...models import Role, Resource,User as model_user
 # from django.contrib.auth import authenticate, login
 import getpass
 from prettytable import PrettyTable
@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
     def admin_options(self,user):
         print """press 1 for Login as another user \npress 2 for Create user \npress 3 for Edit role \
-        \npress 4 for Logout"""
+        \npress 4 for View Users \npress 5 for Logout"""
         options = input("Please Input: ")
         self.admin_select(options,user)
 
@@ -65,6 +65,18 @@ class Command(BaseCommand):
         print "User with username {0} Created Successfully: ".format(username)
         return self.admin_options(user)
 
+    def list_of_user(self,user):
+        user_list = User.objects.all()
+        table = PrettyTable(['Username', 'User Type'])
+        for users in user_list:
+            if users.is_superuser:
+                table.add_row([users.username, 'Admin User'])
+            else:
+                table.add_row([users.username,'Normal User'])
+        print table
+        raw_input("Press Enter to continue...")
+        return self.admin_options(user)
+
     def view_role_general(self,user):
         role_list = Role.objects.all()
         tuple(role_list)
@@ -78,11 +90,39 @@ class Command(BaseCommand):
 
     def view_role(self,user):
         self.view_role_general(user)
+        raw_input("Press Enter to continue...")
         return self.user_options(user)
 
-
+    @with_goto
     def edit_role(self,user):
-        self.view_role(user)
+        self.view_role_general(user)
+        role_name = raw_input("Enter Role Name to Edit : ")
+        #try:
+        role = Role.objects.get(name=role_name)
+        label .action_type
+        action_type =  raw_input("Action Type (Read, Write, Delete) : ")
+        if action_type.lower() in ['read','write','delete']:
+            role.action_type = action_type.lower()
+            user_update_flag = raw_input("""Press 1 Replace Existing Users \nPress 2 Update Users \nElse Press anything for Main Menu """)
+            if user_update_flag not in ['1','2']:
+                self.admin_options(user)
+            users_input = raw_input("Enter comma seperated: ")
+            user_list = users_input.split(',')
+            if user_update_flag == '1':
+                users_remove = [users_role.id for users_role in role.users.prefetch_related()]
+                role.users.remove(*tuple(users_remove))
+            users_add = [users_id.id for users_id in model_user.objects.filter(user__username__in=user_list)]
+            role.users.add(*tuple(users_add))
+            role.save()
+            print "Role Updated Successfully"
+            self.view_role_general(user)
+            raw_input("Press Enter to continue...")
+        else:
+            goto .action_type;
+        #except:
+            #print "No Role found with role name {0}".format(role_name)
+
+        self.admin_options(user)
         return "Editing Role"
 
     def access_resource(self,user):
@@ -97,7 +137,8 @@ class Command(BaseCommand):
             1: self.login_user,
             2: self.create_user,
             3: self.edit_role,
-            4: self.exit,
+            4: self.list_of_user,
+            5: self.exit,
         }
         func = switcher.get(argument, lambda :"Invalid Option")
         func(user)

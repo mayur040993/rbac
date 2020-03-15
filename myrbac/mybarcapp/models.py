@@ -10,23 +10,23 @@ class User(models.Model):
     Represents an user
     """
     user = models.OneToOneField(user, null=False, blank=False, on_delete=models.CASCADE, related_name='user')
-    name = models.CharField(max_length=255, null=True, blank=False)
-    email = models.EmailField(null=True, blank=False)
+    name = models.CharField(max_length=255, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __unicode__(self):
         return "%s" % (self.user)
 
-    def create_user(sender, instance, created, **kwargs):
-        """
-        create a user when a django  user is created
-        """
-        user, created = User.objects.get_or_create(user=instance)
-        user.name = instance.first_name
-        user.email = instance.email
-        user.save()
+def create_user(sender, instance, created, **kwargs):
+    """
+    create a user when a django  user is created
+    """
+    user, created = User.objects.get_or_create(user=instance)
+    user.name = instance.first_name
+    user.email = instance.email
+    user.save()
 
-    post_save.connect(create_user, sender=user)
+post_save.connect(create_user, sender=user)
 
 
 class Resource(models.Model):
@@ -37,7 +37,7 @@ class Resource(models.Model):
 
 class Role(models.Model):
     resource = models.ForeignKey(Resource, related_name='rm')
-    name = models.CharField(max_length=128, null=False, blank=False)
+    name = models.CharField(max_length=128, null=False, blank=False,unique=True)
     users = models.ManyToManyField(User,blank=True)
     ACTION_TYPE=(
         ('Read','read'),
