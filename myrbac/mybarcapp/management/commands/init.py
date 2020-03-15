@@ -30,8 +30,8 @@ class Command(BaseCommand):
             r.save()
         nrole = input("No of Role you want : ")
         for i in range(nrole):
-            name = raw_input(" Role Name {0}: ".format(i+1))
-            resource = raw_input(" Resource Name :")
+            name = raw_input("Role Name {0}: ".format(i+1))
+            resource = raw_input("Resource Name :")
             action_type = raw_input("Action Type [Default Read] (Read, Write, Delete) ")
             resource_instance = Resource.objects.get(resource=resource)
             r = Role(resource=resource_instance, name=name, action_type=action_type.lower())

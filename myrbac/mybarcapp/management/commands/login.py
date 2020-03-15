@@ -100,7 +100,7 @@ class Command(BaseCommand):
             action_type =  raw_input("Action Type (Read, Write, Delete) : ")
             if action_type.lower() in ['read','write','delete']:
                 role.action_type = action_type.lower()
-                user_update_flag = raw_input("""Press 1 Replace Existing Users \nPress 2 Update Users \nElse Press anything for Main Menu """)
+                user_update_flag = raw_input("""Press 1 Replace Existing Users \nPress 2 Update Users \nElse Press anything for Main Menu \nInput: """)
                 if user_update_flag not in ['1','2']:
                     self.admin_options(user)
                 users_input = raw_input("Enter comma seperated: ")
