@@ -4,7 +4,9 @@ from goto import with_goto
 from ...models import Role, Resource
 # from django.contrib.auth import authenticate, login
 import getpass
+from prettytable import PrettyTable
 # from django.contrib.auth import get_user_model
+
 
 class Command(BaseCommand):
     help = '''login to system'''
@@ -30,7 +32,9 @@ class Command(BaseCommand):
 
     def user_options(self,user):
         print """hi! you are logged in as {0} \npress 1 for Login as another user \npress 2 for View roles \
-                       \npress 3 for access resource""".format(user)
+                       \npress 3 for access resource \npress 4 for Logout""".format(user)
+        options = input("Please Input: ")
+        self.user_select(options,user)
 
     def login_user(self,user):
         return self.handle()
@@ -61,9 +65,28 @@ class Command(BaseCommand):
         print "User with username {0} Created Successfully: ".format(username)
         return self.admin_options(user)
 
+    def view_role_general(self,user):
+        role_list = Role.objects.all()
+        tuple(role_list)
+        table = PrettyTable(['Role Name', 'Action', 'Resource', 'Users'])
+        for role in role_list:
+            users = [ user_list.user.username  for user_list in role.users.all()]
+            table.add_row([role.name, role.action_type, role.resource, ','.join(users)])
+
+        print(table)
+        return  "Viewing Role"
+
+    def view_role(self,user):
+        self.view_role_general(user)
+        return self.user_options(user)
+
+
     def edit_role(self,user):
-        #role_list
-        return  "Editing Role"
+        self.view_role(user)
+        return "Editing Role"
+
+    def access_resource(self,user):
+        return "Access Resource"
 
     def exit(self,user):
         print "Logout User {0}".format(user)
@@ -74,6 +97,16 @@ class Command(BaseCommand):
             1: self.login_user,
             2: self.create_user,
             3: self.edit_role,
+            4: self.exit,
+        }
+        func = switcher.get(argument, lambda :"Invalid Option")
+        func(user)
+
+    def user_select(self, argument,user):
+        switcher = {
+            1: self.login_user,
+            2: self.view_role,
+            3: self.access_resource,
             4: self.exit,
         }
         func = switcher.get(argument, lambda :"Invalid Option")
