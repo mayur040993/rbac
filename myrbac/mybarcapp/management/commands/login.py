@@ -2,11 +2,8 @@ from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from goto import with_goto
 from ...models import Role, Resource,User as model_user
-# from django.contrib.auth import authenticate, login
 import getpass
 from prettytable import PrettyTable
-# from django.contrib.auth import get_user_model
-
 
 class Command(BaseCommand):
     help = '''login to system'''
@@ -97,36 +94,87 @@ class Command(BaseCommand):
     def edit_role(self,user):
         self.view_role_general(user)
         role_name = raw_input("Enter Role Name to Edit : ")
-        #try:
-        role = Role.objects.get(name=role_name)
-        label .action_type
-        action_type =  raw_input("Action Type (Read, Write, Delete) : ")
-        if action_type.lower() in ['read','write','delete']:
-            role.action_type = action_type.lower()
-            user_update_flag = raw_input("""Press 1 Replace Existing Users \nPress 2 Update Users \nElse Press anything for Main Menu """)
-            if user_update_flag not in ['1','2']:
-                self.admin_options(user)
-            users_input = raw_input("Enter comma seperated: ")
-            user_list = users_input.split(',')
-            if user_update_flag == '1':
-                users_remove = [users_role.id for users_role in role.users.prefetch_related()]
-                role.users.remove(*tuple(users_remove))
-            users_add = [users_id.id for users_id in model_user.objects.filter(user__username__in=user_list)]
-            role.users.add(*tuple(users_add))
-            role.save()
-            print "Role Updated Successfully"
-            self.view_role_general(user)
-            raw_input("Press Enter to continue...")
-        else:
-            goto .action_type;
-        #except:
-            #print "No Role found with role name {0}".format(role_name)
+        try:
+            role = Role.objects.get(name=role_name)
+            label .action_type
+            action_type =  raw_input("Action Type (Read, Write, Delete) : ")
+            if action_type.lower() in ['read','write','delete']:
+                role.action_type = action_type.lower()
+                user_update_flag = raw_input("""Press 1 Replace Existing Users \nPress 2 Update Users \nElse Press anything for Main Menu """)
+                if user_update_flag not in ['1','2']:
+                    self.admin_options(user)
+                users_input = raw_input("Enter comma seperated: ")
+                user_list = users_input.split(',')
+                if user_update_flag == '1':
+                    users_remove = [users_role.id for users_role in role.users.prefetch_related()]
+                    role.users.remove(*tuple(users_remove))
+                users_add = [users_id.id for users_id in model_user.objects.filter(user__username__in=user_list)]
+                role.users.add(*tuple(users_add))
+                role.save()
+                print "Role Updated Successfully"
+                self.view_role_general(user)
+                raw_input("Press Enter to continue...")
+            else:
+                goto .action_type;
+        except:
+            print "No Role found with role name {0}".format(role_name)
 
-        self.admin_options(user)
-        return "Editing Role"
+        return  self.admin_options(user)
 
+    @with_goto
     def access_resource(self,user):
-        return "Access Resource"
+        label .resource
+        print "----------------------------------------------------"
+        print "List of Resource Access you have"
+        user_instance = model_user.objects.get(user__username=user)
+        role_list = Role.objects.filter(users=user_instance)
+        tuple(role_list)
+        table = PrettyTable(['Resource', 'Action'])
+        resource_dict={}
+        for role in role_list:
+            resource_dict[role.resource.resource] = role.action_type
+            table.add_row([role.resource.resource,role.action_type])
+        if len(role_list) == 0:
+            print "You don't have access to any resource"
+            return self.user_options(user)
+        print(table)
+        raw_input("Press Enter to continue...")
+        print "----------------------------------------------------\n"
+        resource_name = raw_input("Enter Resource Name for the action: ")
+        if resource_name in resource_dict.keys():
+            print "You have {0} access to {1} ".format(resource_dict[resource_name], resource_name)
+            if resource_dict[resource_name].lower() == 'read':
+                input = raw_input("Press 1 to Read Data\nEnter Any Key to go to main menu..\n")
+                if input not in ['1']:
+                    return self.user_options(user)
+                else:
+                    resource_instance = Resource.objects.get(resource=resource_name)
+                    print resource_instance.data
+            elif resource_dict[resource_name].lower() == 'write':
+                input = raw_input("Press 1 to Read Data\nPress 2 to Update Data\nEnter Any Key to go to main menu..\n")
+                if input not in ['1','2']:
+                    return self.user_options(user)
+                elif input == '1':
+                    resource_instance = Resource.objects.get(resource=resource_name)
+                    print resource_instance.data
+                elif input == '2':
+                    resource_instance = Resource.objects.get(resource=resource_name)
+                    print resource_instance.data
+                    data = raw_input("Enter New Data")
+                    resource_instance.data = data
+                    resource_instance.save()
+            elif resource_dict[resource_name].lower() == 'delete':
+                input = raw_input("Press 1 to Delete\nEnter Any Key to go to main menu..\n")
+                if input not in ['1']:
+                    return self.user_options(user)
+                elif input == '1':
+                    resource_instance = Resource.objects.get(resource=resource_name)
+                    resource_instance.delete()
+        else:
+            print "Accessing wrong Resource"
+            goto .resource
+
+        return self.user_options(user)
 
     def exit(self,user):
         print "Logout User {0}".format(user)

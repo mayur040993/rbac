@@ -31,7 +31,7 @@ post_save.connect(create_user, sender=user)
 
 class Resource(models.Model):
     resource = models.CharField(max_length=255, null=False,unique=True)
-
+    data = models.TextField(null=True,blank=True)
     def __str__(self):
         return self.resource
 

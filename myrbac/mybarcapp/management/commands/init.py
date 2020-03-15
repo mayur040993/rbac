@@ -24,8 +24,9 @@ class Command(BaseCommand):
             User.objects.create_user(username=normal_user, email='', password=normal_user_password)
         nresource = input("No of Resource you want : ")
         for i in range(nresource):
-            resource = raw_input(" Resource Name {0}: ".format(i+1))
-            r = Resource(resource=resource)
+            resource = raw_input("Resource Name {0}: ".format(i+1))
+            data = raw_input("Resource Data {0}: ".format(i+1))
+            r = Resource(resource=resource,data=data)
             r.save()
         nrole = input("No of Role you want : ")
         for i in range(nrole):
